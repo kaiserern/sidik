@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="210" viewBox="0 0 900 210" role="img" aria-label="Enam tingkat bukti, dari ID transaksi sampai bot bertanya balik">
+<style>
+  text { font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace; }
+  .lbl { font-size: 10px; letter-spacing: 2px; fill: #7C858F; }
+  .num { font-size: 10px; fill: #7C858F; }
+  .t { font-size: 11.5px; fill: #E8EBEF; }
+  .c { font-size: 9.5px; }
+  .step { animation: 14s infinite both; }
+  @keyframes dim { 0% { opacity: 0.45; } 100% { opacity: 0.45; } }
+  @media (prefers-reduced-motion: reduce) { .step { animation: none; opacity: 0.85; } }
+</style>
+<rect width="900" height="210" rx="16" fill="#0B0D10"/>
+<rect x="0.5" y="0.5" width="899" height="209" rx="16" fill="none" stroke="#1F262F"/>
+<text class="lbl" x="30" y="34">BUKTI PALING KUAT</text>
+<text class="lbl" x="870" y="34" text-anchor="end">PALING TIPIS</text>
+<line x1="30" y1="46" x2="870" y2="46" stroke="#1F262F"/>
+<g class="step" style="animation-name: s0">
+<rect x="30" y="60" width="133" height="104" rx="10" fill="#12161C" stroke="#1F262F"/>
+<text class="num" x="44" y="82">01</text>
+<text class="t" x="44" y="106">ID transaksi</text>
+<text class="t" x="44" y="122">dari pelapor</text>
+<text class="c" x="44" y="148" fill="#bdfe0a">high</text>
+</g>
+<style>@keyframes s0 {0% { opacity: 0.45; } 30.00% { opacity: 0.45; } 40.00% { opacity: 1; } 48.00% { opacity: 0.45; } 100% { opacity: 0.45; } }</style>
+<g class="step" style="animation-name: s1">
+<rect x="175" y="60" width="133" height="104" rx="10" fill="#12161C" stroke="#1F262F"/>
+<text class="num" x="189" y="82">02</text>
+<text class="t" x="189" y="106">Nominal, jam,</text>
+<text class="t" x="189" y="122">atau struk</text>
+<text class="c" x="189" y="148" fill="#E8C468">medium</text>
+</g>
+<style>@keyframes s1 {0% { opacity: 0.45; } 37.50% { opacity: 0.45; } 47.50% { opacity: 1; } 55.50% { opacity: 0.45; } 100% { opacity: 0.45; } }</style>
+<g class="step" style="animation-name: s2">
+<rect x="320" y="60" width="133" height="104" rx="10" fill="#12161C" stroke="#1F262F"/>
+<text class="num" x="334" y="82">03</text>
+<text class="t" x="334" y="106">Arus per</text>
+<text class="t" x="334" y="122">tahap alur</text>
+<text class="c" x="334" y="148" fill="#E8C468">medium</text>
+</g>
+<style>@keyframes s2 {0% { opacity: 0.45; } 45.00% { opacity: 0.45; } 55.00% { opacity: 1; } 63.00% { opacity: 0.45; } 100% { opacity: 0.45; } }</style>
+<g class="step" style="animation-name: s3">
+<rect x="465" y="60" width="133" height="104" rx="10" fill="#12161C" stroke="#1F262F"/>
+<text class="num" x="479" y="82">04</text>
+<text class="t" x="479" y="106">Pelapor pilih</text>
+<text class="t" x="479" y="122">gejalanya</text>
+<text class="c" x="479" y="148" fill="#7C858F">low</text>
+</g>
+<style>@keyframes s3 {0% { opacity: 0.45; } 52.50% { opacity: 0.45; } 62.50% { opacity: 1; } 70.50% { opacity: 0.45; } 100% { opacity: 0.45; } }</style>
+<g class="step" style="animation-name: s4">
+<rect x="610" y="60" width="133" height="104" rx="10" fill="#12161C" stroke="#1F262F"/>
+<text class="num" x="624" y="82">05</text>
+<text class="t" x="624" y="106">Bandingkan</text>
+<text class="t" x="624" y="122">7 hari</text>
+<text class="c" x="624" y="148" fill="#7C858F">low</text>
+</g>
+<style>@keyframes s4 {0% { opacity: 0.45; } 60.00% { opacity: 0.45; } 70.00% { opacity: 1; } 78.00% { opacity: 0.45; } 100% { opacity: 0.45; } }</style>
+<g class="step" style="animation-name: s5">
+<rect x="755" y="60" width="133" height="104" rx="10" fill="#12161C" stroke="#1F262F"/>
+<text class="num" x="769" y="82">06</text>
+<text class="t" x="769" y="106">Bot tanya</text>
+<text class="t" x="769" y="122">balik</text>
+<text class="c" x="769" y="148" fill="#7C858F">-</text>
+</g>
+<style>@keyframes s5 {0% { opacity: 0.45; } 67.50% { opacity: 0.45; } 77.50% { opacity: 1; } 85.50% { opacity: 0.45; } 100% { opacity: 0.45; } }</style>
+<text class="c" x="30" y="186" fill="#7C858F">Tingkat yang dipakai selalu disebut di baris &quot;Dasar&quot;, jadi pembaca tahu sekuat apa buktinya.</text>
+</svg>

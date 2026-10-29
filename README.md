@@ -1,14 +1,38 @@
-# Sidik
+<p align="center">
+  <img src="docs/hero.svg" alt="Laporan masuk dari Teams, log Loki dibaca, jawaban keluar: worker-payment" width="860">
+</p>
 
-Cari tahu satu transaksi gagal itu gara-gara worker yang mana, tanpa perlu buka Loki.
+<h1 align="center">Sidik</h1>
 
-**Yang terjadi sekarang.** Ada laporan dari divisi lain. Satu engineer buka Loki, nebak nama worker, cocokin jam kejadian, lalu baca log mentah. Satu laporan bisa 10 sampai 30 menit. Kalau yang lapor bukan orang teknis, separuh waktunya habis buat tanya balik.
+<p align="center">
+  <b>Laporan transaksi gagal masuk. Jawaban keluar: worker yang mana.</b>
+</p>
 
-**Kalau pakai ini.** Orangnya tulis keluhan di Teams, bot jawab dalam hitungan detik: worker mana yang gagal, divisi siapa pemiliknya, channel mana yang harus di-tag, plus tiga baris bukti dari log.
+<p align="center">
+  <img src="https://img.shields.io/badge/tests-21%20lulus-bdfe0a?style=flat-square&labelColor=1f262f" alt="21 test lulus">
+  <img src="https://img.shields.io/badge/python-3.10%2B-e8c468?style=flat-square&labelColor=1f262f" alt="Python 3.10+">
+  <img src="https://img.shields.io/badge/lisensi-MIT-7c858f?style=flat-square&labelColor=1f262f" alt="Lisensi MIT">
+  <img src="https://img.shields.io/badge/butuh%20internet-tidak-7c858f?style=flat-square&labelColor=1f262f" alt="Test jalan tanpa internet">
+</p>
 
-## Contohnya
+---
 
-Ada yang nulis ID transaksinya:
+Orang dari divisi mana pun cukup tulis keluhan di Teams. Beberapa detik kemudian bot menjawab: **worker mana yang gagal, divisi siapa pemiliknya, channel mana yang perlu di-tag,** plus tiga baris log sebagai bukti. Nggak ada yang perlu buka Loki.
+
+Sekarang, satu laporan kayak gitu makan 10 sampai 30 menit: satu engineer buka Loki, nebak nama worker, cocokin jam, baca log mentah. Kalau yang lapor bukan orang teknis, separuh waktunya habis buat tanya balik.
+
+## Coba dulu, 30 detik
+
+```bash
+pip install -e .
+python -m sidik
+```
+
+Data contoh satu insiden sudah ikut di dalam repo, jadi Loki belum dibutuhkan buat lihat hasilnya.
+
+## Contoh jawaban
+
+Pelapor menulis ID transaksinya:
 
 ```
 Penyebab: worker-payment (Payment Ops)
@@ -21,7 +45,7 @@ Bukti:
   14:00:44 worker-payment transfer marked failed, reversal queued trx_id=TRX2026102900123 card=[REDACTED-ID]
 ```
 
-Ada yang cuma nulis *"transfer Rp1.250.000 jam 14:00 gagal masuk"*, tanpa ID sama sekali. Bot nyari sendiri barisnya, nemu ID-nya di log, lalu jawab:
+Pelapor cuma menulis *"transfer Rp1.250.000 jam 14:00 gagal masuk"*. Nggak ada ID. Bot tetap bisa jawab, karena dia mencari ID-nya sendiri di log:
 
 ```
 Penyebab: worker-payment (Payment Ops)
@@ -31,83 +55,81 @@ ID yang dipakai: TRX2026102900123
 Eskalasi ke: #payment-war-room
 ```
 
-Beda `high` dan `medium` itu penting. `high` berarti ID-nya datang dari mulut pelapor. `medium` berarti bot yang nemuin ID-nya, dan itu satu langkah lebih jauh dari kepastian. Kalau tulisannya `low`, jawabannya cuma lead: bot nyebut alasannya, dan alasannya selalu kelihatan.
+Bedanya `high` dan `medium` penting. `high` berarti ID-nya datang dari mulut pelapor. `medium` berarti bot yang menemukannya, dan itu satu langkah lebih jauh dari kepastian. Kalau tertulis `low`, jawabannya baru sebatas dugaan, dan alasannya selalu ikut ditulis.
 
-Nomor kartu di log asli sudah hilang, diganti `[REDACTED-ID]`. Ini bukan hiasan. Bot ini nampilin potongan log produksi ke channel yang dibaca banyak divisi, jadi data nasabah harus dibuang sebelum keluar.
+Nomor kartu di log asli sudah hilang, berubah jadi `[REDACTED-ID]`. Ini bukan hiasan. Potongan log produksi ini tampil di channel yang dibaca banyak divisi, jadi data nasabah dibuang sebelum keluar.
 
-## Cara kerjanya: satu tangga, dari paling pasti ke paling jujur
+## Cara memilih worker: lihat bukti yang ada
+
+<p align="center">
+  <img src="docs/ladder.svg" alt="Enam tingkat bukti, dari ID transaksi dari pelapor sampai bot bertanya balik" width="860">
+</p>
 
 Bot nggak mulai dari "pakai AI atau nggak". Bot mulai dari pertanyaan: **bukti apa yang ada?** Tiap tingkat punya cara jawab sendiri, dan tingkat yang dipakai selalu disebut di baris `Dasar`.
 
-| Bukti yang ada | Yang dilakukan | Keyakinan |
-|---|---|---|
-| ID transaksi ditulis pelapor | Ikutin ID itu ke semua worker. Error cuma di satu worker, itu jawabannya. | `high` |
-| Nominal, jam, atau screenshot | Cari baris log yang cocok, baca ID-nya dari baris itu, lanjut seperti di atas | `medium` |
-| Nggak ada ID, tapi arus transaksi kelihatan | Hitung tiap tahap alur: berapa transaksi sampai payment, core, notify, settlement. Tahap yang kehilangan paling banyak, itu jawabannya | `medium` |
-| Cuma gejala | Tiga tombol di kartu Teams menyempitkan worker yang perlu dicek | `low` |
-| Cuma "ada yang error" | Bandingkan tiap worker dengan kebiasaannya sendiri 7 hari terakhir di jam yang sama | `low` |
-| Nggak ada apa-apa | Bot bilang belum bisa, dan minta satu data spesifik | - |
+- **ID transaksi ada.** Ikuti ID itu ke semua worker. Kalau error cuma di satu worker, itu jawabannya.
+- **Nggak ada ID, tapi ada nominal, jam, atau struk.** Cari baris log yang cocok, baca ID-nya dari baris itu, lalu lanjut seperti di atas.
+- **Nggak ada ID, tapi arus transaksi kelihatan.** Hitung tiap tahap alur: berapa transaksi sampai payment, core, notify, settlement. Tahap yang paling banyak kehilangan, itu jawabannya.
+- **Cuma gejala.** Tiga tombol di kartu Teams menyempitkan worker yang perlu dicek.
+- **Cuma "ada yang error".** Bandingkan tiap worker dengan kebiasaannya sendiri tujuh hari terakhir di jam yang sama.
+- **Nggak ada apa-apa.** Bot bilang belum bisa, dan minta satu data spesifik.
 
-Yang milih worker selalu kode biasa, bukan AI. AI cuma dipakai buat dua hal: nerjemahin kalimat pelapor jadi parameter pencarian, dan nulis ringkasan kalimat. Dua-duanya opsional; kalau modelnya mati, jawabannya tetap keluar.
+Yang memilih worker selalu kode biasa, bukan AI. AI cuma dipakai buat dua hal: menerjemahkan kalimat pelapor jadi parameter pencarian, dan menulis ringkasan. Dua-duanya opsional. Kalau modelnya mati, jawabannya tetap keluar.
 
 ## Kalau pelapornya cuma kirim gambar
 
-Dua jenis gambar, dua jalan yang beda.
+Dua jenis gambar, dua jalan berbeda.
 
-**Screenshot struk atau detail transaksi.** Isinya nominal, jam, dan potongan nomor rekening. Bot baca teksnya, ambil nominal dan jam, lalu cari satu baris log yang nominalnya sama dan jamnya dekat. Dari baris itu bot baca ID transaksinya sendiri. Pelapor nggak perlu ngerti ID itu apa.
+**Struk atau detail transaksi.** Isinya nominal, jam, dan potongan nomor rekening. Bot membaca teksnya, mengambil nominal dan jam, lalu mencari baris log yang nominalnya sama dan jamnya dekat. Dari baris itu bot membaca ID transaksinya sendiri. Pelapor nggak perlu tahu ID itu apa.
 
-**Screenshot pesan error.** Yang kebaca biasanya kode error, bukan ID. Itu tetap berguna: kode error menyempitkan worker, dan jam kirim pesan memotong jendela waktu dari 2 jam jadi beberapa menit.
+**Screenshot pesan error.** Yang terbaca biasanya kode error, bukan ID. Itu masih berguna: kode error menyempitkan worker, dan jam kirim pesan memotong jendela waktu dari 2 jam jadi beberapa menit.
 
-Satu syarat teknis: `tesseract` harus terpasang di mesin bot (`sudo apt install tesseract-ocr`). Kalau belum ada, bot bilang terus terang dan minta nominal + jam diketik. Bot nggak pura-pura bisa baca gambar.
+Syaratnya `tesseract` terpasang di mesin bot (`sudo apt install tesseract-ocr`). Kalau belum ada, bot bilang terus terang dan minta nominal + jam diketik. Bot nggak pura-pura bisa membaca gambar.
 
-Yang perlu diwaspadai: struk yang difoto miring, blur, atau kena pantulan layar sering gagal dibaca. Karena itu jalur gambar selalu punya jalan mundur, bukan jadi satu-satunya jalan.
+## Kalau yang lapor banyak orang
 
-## Kalau yang lapor banyak orang sekaligus
+Satu orang melapor "transfer gagal" tanpa ID, delapan dari sepuluh kali itu OTP salah atau limit harian, bukan worker rusak. Tapi lima orang melapor dalam sepuluh menit, itu insiden.
 
-Satu orang lapor "transfer gagal" tanpa ID, delapan dari sepuluh kali itu OTP salah atau limit harian, bukan worker rusak. Lima orang lapor dalam sepuluh menit, itu insiden.
-
-Bot nyatet tiap laporan ke sqlite kecil, lalu ngitung laporan serupa dalam 10 menit terakhir. Kalau tiga atau lebih, jumlahnya muncul di jawaban:
+Bot mencatat tiap laporan ke sqlite kecil, lalu menghitung laporan serupa dalam 10 menit terakhir. Kalau tiga atau lebih, jumlahnya muncul di jawaban:
 
 ```
 Laporan serupa: 4 dalam 10 menit
 ```
 
-Angka ini nggak naikin keyakinan bot soal worker mana yang salah. Yang naik itu tingkat urgensi, dan itu dua hal berbeda. Bot yang ngaku yakin cuma gara-gara banyak yang komplain akan salah lagi di hari yang sama.
+Angka ini **tidak** menaikkan keyakinan bot soal worker mana yang salah. Yang naik adalah urgensi. Itu dua hal berbeda, dan bot yang mengaku yakin cuma karena banyak yang komplain akan salah lagi di hari yang sama.
 
 ## Berapa biayanya kalau pakai AI
 
-Diukur langsung ke API, bukan dikira-kira. Satu laporan butuh dua panggilan model: satu buat baca kalimat, satu buat nulis ringkasan.
+Diukur langsung ke API, bukan dikira-kira. Satu laporan butuh dua panggilan model: satu buat membaca kalimat, satu buat menulis ringkasan.
 
-- Token masuk: **430** per laporan (dua panggilan digabung)
-- Token keluar: **560 sampai 810** per laporan, tergantung panjang jawaban model
-- Harga `deepseek-v4.1-flash`: $0.15 per 1 juta token masuk, $0.60 per 1 juta token keluar
-
-Hasilnya:
+- Token masuk: **430** per laporan
+- Token keluar: **560 sampai 810** per laporan
+- Harga `deepseek-v4.1-flash`: $0.15 per juta token masuk, $0.60 per juta token keluar
 
 | Volume laporan | Biaya per bulan |
 |---|---|
-| 200 per hari | sekitar $3.3 (Rp54 ribu) |
+| 200 per hari | sekitar $3,3 (Rp54 ribu) |
 | 1.000 per hari | sekitar $12 sampai $16 (Rp200 sampai 270 ribu) |
 | 5.000 per hari | sekitar $76 (Rp1,2 juta) |
 
-Satu laporan kira-kira **Rp7 sampai Rp9**. Buat bandingin: satu laporan yang nunggu 20 menit itu menghabiskan waktu engineer yang jauh lebih mahal daripada itu.
+Satu laporan sekitar **Rp7 sampai Rp9**. Bandingkan dengan satu laporan yang menunggu 20 menit: waktu engineer jauh lebih mahal daripada itu.
 
-Angkanya bisa dihitung ulang sendiri, dan sebaiknya dihitung ulang pakai harga penyedia yang lu pakai:
+Angkanya bisa dihitung ulang sendiri, dan sebaiknya pakai harga penyedia yang kamu pakai:
 
 ```bash
 LLM_BASE_URL=... LLM_API_KEY=*** LLM_MODEL=... \
   python tools/cost.py --complaints 1000 --in-price 0.15 --out-price 0.60
 ```
 
-Kalau AI dimatikan, biayanya nol dan bot tetap jawab. Yang hilang cuma kalimat penjelasannya.
+Kalau AI dimatikan, biayanya nol dan bot tetap menjawab. Yang hilang cuma kalimat penjelasannya.
 
-Catatan jujur: angka di atas diukur di build `deepseek-v4.1-flash`. Build `-1017` punya harga list yang sama persis, tapi waktu pengukuran ini dilakukan endpoint-nya balas 503, jadi yang diukur build yang bisa dihubungi. Selisih harga antarpenyedia lumayan lebar untuk model yang sama, dari $0.045 sampai $0.67 per juta token masuk, jadi cek dulu sebelum milih.
+Catatan jujur: angka di atas diukur di build `deepseek-v4.1-flash`. Build `-1017` punya harga list yang sama persis, tapi saat pengukuran endpoint-nya membalas 503, jadi yang diukur build yang bisa dihubungi. Harga antarpenyedia untuk model yang sama selisihnya lebar, dari $0.045 sampai $0.67 per juta token masuk, jadi cek dulu sebelum memilih.
 
-## Yang harus disiapin dulu
+## Yang harus disiapkan
 
-Cuma satu yang benar-benar penentu: worker harus nulis ID transaksi ke log. Satu field, di setiap baris yang berhubungan sama transaksi, misalnya `trx_id`.
+Cuma satu yang benar-benar menentukan: **worker harus menulis ID transaksi ke log.** Satu field, di setiap baris yang berhubungan dengan transaksi, misalnya `trx_id`.
 
-Tanpa field itu, tiga dari enam tingkat di tangga atas nggak bisa jalan. Jadi kerjaan pertamanya bukan bikin bot, tapi nambahin field itu di worker.
+Tanpa field itu, tiga dari enam tingkat di tangga atas nggak bisa jalan. Jadi kerjaan pertamanya bukan bikin bot, tapi menambahkan field itu di worker.
 
 Cek cepat, field-nya sudah ada atau belum:
 
@@ -115,51 +137,40 @@ Cek cepat, field-nya sudah ada atau belum:
 {job=~"worker-.+"} |= "TRX" | json | line_format "{{.job}}"
 ```
 
-Dua file kecil buat diisi manusia, totalnya sekitar 30 baris:
+Dua file kecil untuk diisi manusia, totalnya sekitar 30 baris:
 
-- `sidik/owners.json` - peta worker ke divisi dan channel Teams
-- `sidik/hints.json` - tiga gejala yang paling sering dilaporkan, dan urutan tahap alur pembayaran
+- `sidik/owners.json` — peta worker ke divisi dan channel Teams
+- `sidik/hints.json` — tiga gejala yang paling sering dilaporkan, dan urutan tahap alur pembayaran
 
-## Coba dulu, nggak perlu Loki
-
-Data contoh satu insiden sudah ikut di dalam repo.
+## Perintah lain
 
 ```bash
-pip install -e .
-python -m sidik
+python -m sidik ask TRX2026102900123 --replay                      # ada ID
+python -m sidik triage "transfer Rp1.250.000 jam 14:00 gagal" --replay   # tanpa ID
+python -m sidik triage "dana kepotong" --image struk.png --replay        # dari gambar
+python -m sidik funnel --replay                                     # tahap mana yang bocor
+python -m pytest -q                                                 # 21 test
 ```
 
-Keluarannya dua cara sekaligus di satu keluhan yang sama, jadi bisa dibandingin.
-
-Perintah lain:
-
-```bash
-python -m sidik ask TRX2026102900123 --replay                  # ada ID
-python -m sidik triage "transfer Rp1.250.000 jam 14:00 gagal" --replay  # tanpa ID
-python -m sidik triage "dana kepotong" --image struk.png --replay       # dari gambar
-python -m sidik funnel --replay                                # tahap mana yang bocor
-python -m pytest -q                                              # 21 test
-```
-
-Sambung ke Loki asli: isi `LOKI_URL`. Aktifin AI: isi `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`. Semua variabelnya ada di `.env.example`.
+Sambung ke Loki asli: isi `LOKI_URL`. Aktifkan AI: isi `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`. Semua variabelnya ada di `.env.example`.
 
 ## Batasan yang perlu diketahui
 
-Pembanding 7 hari butuh data 7 hari. Di instalasi baru, bot bakal bilang belum ada pembanding dan turun ke urutan jumlah error biasa.
+Pembanding tujuh hari butuh data tujuh hari. Di instalasi baru, bot akan bilang belum ada pembanding dan turun ke urutan jumlah error biasa.
 
 Hitungan alur cuma dipakai kalau selisihnya besar: minimal 5 transaksi masuk tahap pertama, dan minimal 20% hilang di satu hop. Di bawah itu, selisihnya masih bisa dijelaskan oleh traffic normal.
 
-Sensor hanya nutup angka 12 digit ke atas, email, dan nomor HP. Rekening 10 sampai 11 digit belum kesensor, karena aturan itu juga bakal ikut nyensor nominal rupiah.
+Sensor baru menutup angka 12 digit ke atas, email, dan nomor HP. Rekening 10 sampai 11 digit belum tersensor, karena aturan itu ikut menyensor nominal rupiah.
 
-Bot Teams-nya belum ada di repo ini. Yang ada mesin penjawabnya dan bentuk datanya, plus tiga kartu siap pakai di `teams/`. Pendaftaran Azure Bot butuh izin tenant dan biasanya paling lama, jadi sengaja dipisah supaya bisa dikerjain paralel.
+Bot Teams-nya belum ada di repo ini. Yang ada mesin penjawabnya dan bentuk datanya, plus tiga kartu siap pakai di `teams/`. Pendaftaran Azure Bot butuh izin tenant dan biasanya paling lama, jadi sengaja dipisah supaya bisa dikerjakan paralel.
 
-Repo ini juga bukan pengganti tool alerting. Alerting bereaksi ke kondisi yang sudah diketahui sebelumnya. Sidik bereaksi ke pertanyaan yang datang dari orang, dengan konteks yang cuma ada di kepala pelapor: ID transaksi, jam kejadian, gejala yang dia lihat.
+Repo ini juga bukan pengganti tool alerting. Alerting bereaksi ke kondisi yang sudah diketahui sebelumnya. Sidik bereaksi ke pertanyaan yang datang dari orang, dengan konteks yang cuma ada di kepala pelapor.
 
 ## Kalau mau lanjut
 
-1. Pastiin `trx_id` ada di log semua worker. Ini penentu utama.
+1. Pastikan `trx_id` ada di log semua worker. Ini penentu utama.
 2. Isi `owners.json` dan `hints.json` dengan isi yang sebenarnya.
-3. Sambung ke Loki, tes pakai 20 ID transaksi asli, cocokin hasilnya sama investigasi manual.
+3. Sambung ke Loki, tes pakai 20 ID transaksi asli, cocokkan hasilnya dengan investigasi manual.
 4. Daftar Azure Bot, sambung ke CLI lewat `--json`.
 5. Baru pertimbangkan AI, setelah tingkat-tingkat tanpa AI terbukti akurat.
 
@@ -167,19 +178,20 @@ Repo ini juga bukan pengganti tool alerting. Alerting bereaksi ke kondisi yang s
 
 ```
 sidik/source.py        baca log dari Loki atau dari file contoh
-sidik/route.py         tangga enam tingkat, nggak pernah pakai AI buat milih worker
+sidik/route.py         tangga enam tingkat, nggak pernah pakai AI buat memilih worker
 sidik/find.py          cari ID transaksi dari nominal, jam, atau hasil baca gambar
 sidik/flow.py          hitung tahap mana yang kehilangan transaksi
 sidik/cluster.py       hitung laporan serupa dalam 10 menit
 sidik/hints.py         tiga gejala dan urutan alur, dari hints.json
 sidik/ocr.py           baca gambar lewat tesseract, kalau terpasang
-sidik/interpret.py     bagian AI, cuma buat nerjemahin dan nulis ringkasan
+sidik/interpret.py     bagian AI, cuma buat menerjemahkan dan menulis ringkasan
 sidik/redact.py        buang nomor kartu, rekening, telepon, email
 sidik/owners.json      peta worker ke divisi dan channel Teams
 sidik/hints.json       gejala yang dilaporkan orang dan urutan tahap alur
 sidik/cli.py           empat perintah: ask, triage, compare, funnel
-tools/cost.py            ukur biaya per laporan pakai usage API yang asli
-data/sample.jsonl        data contoh satu insiden
-teams/                   tiga kartu Teams dan bentuk datanya
-tests/                   21 test, semuanya jalan tanpa internet
+tools/cost.py          ukur biaya per laporan pakai usage API yang asli
+data/sample.jsonl      data contoh satu insiden
+teams/                 tiga kartu Teams dan bentuk datanya
+tests/                 21 test, semuanya jalan tanpa internet
+docs/                  dua gambar animasi di atas
 ```

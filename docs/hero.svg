@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="272" viewBox="0 0 900 272" role="img" aria-label="Laporan masuk, log Loki dibaca, jawaban keluar: worker-payment">
+<style>
+  text { font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace; }
+  .lbl { font-size: 10px; letter-spacing: 2px; fill: #7C858F; }
+  .body { font-size: 13px; fill: #E8EBEF; }
+  .small { font-size: 10px; fill: #7C858F; }
+  .tiny { font-size: 9px; fill: #7C858F; }
+  .ev { font-size: 9px; fill: #A9B2BC; }
+  .badge { font-size: 9px; fill: #bdfe0a; }
+  .chip-name { font-size: 12px; fill: #E8EBEF; }
+  .chip { animation: chipdim 14s infinite both; }
+  .chip rect.box { fill: #12161C; stroke: #1F262F; }
+  .cover { animation: reveal 14s infinite both; }
+  .caret { animation: caretslide 14s infinite both; }
+  .scan { animation: scandot 14s infinite both; }
+  .wire { animation: wire 14s infinite both; }
+  .answer { animation: answer 14s infinite both; }
+  .win rect.box { animation: winbox 14s infinite both; }
+  .win text.chip-name { animation: wintext 14s infinite both; }
+  .win rect.tag { animation: wintag 14s infinite both; }
+
+  @keyframes reveal {
+    0%     { transform: scaleX(1); }
+    8.57% { transform: scaleX(1); }
+    25.71% { transform: scaleX(0); }
+    96.00% { transform: scaleX(0); }
+    100%   { transform: scaleX(1); }
+  }
+  @keyframes caretslide {
+    0%     { transform: translateX(0); opacity: 0; }
+    7.14% { transform: translateX(0); opacity: 1; }
+    25.71% { transform: translateX(262px); opacity: 1; }
+    30.00% { transform: translateX(262px); opacity: 0; }
+    100%   { transform: translateX(0); opacity: 0; }
+  }
+  @keyframes scandot {
+    0%,27.14% { transform: translateY(0px); opacity: 0; }
+    30.00% { transform: translateY(0px); opacity: 1; }
+    47.14% { transform: translateY(148px); opacity: 1; }
+    49.29% { transform: translateY(148px); opacity: 0; }
+    100%   { transform: translateY(0px); opacity: 0; }
+  }
+  @keyframes chipdim {
+    0%,27.14% { opacity: 0.3; }
+    30.00% { opacity: 1; }
+    35.00% { opacity: 0.3; }
+    40.00% { opacity: 1; }
+    43.57% { opacity: 0.3; }
+    47.14% { opacity: 0.3; }
+    100%   { opacity: 0.3; }
+  }
+  @keyframes winbox {
+    0%,45.71% { stroke: #1F262F; fill: #12161C; }
+    49.29% { stroke: #bdfe0a; fill: #161D0C; }
+    100%   { stroke: #bdfe0a; fill: #161D0C; }
+  }
+  @keyframes wintext {
+    0%,45.71% { fill: #7C858F; }
+    49.29% { fill: #bdfe0a; }
+    100%   { fill: #bdfe0a; }
+  }
+  @keyframes wintag {
+    0%,45.71% { fill: #7C858F; }
+    49.29% { fill: #bdfe0a; }
+    100%   { fill: #bdfe0a; }
+  }
+  @keyframes wire {
+    0%,50.00% { transform: translateX(0px); opacity: 0; }
+    51.43% { transform: translateX(0px); opacity: 1; }
+    60.00% { transform: translateX(46px); opacity: 1; }
+    62.14% { transform: translateX(46px); opacity: 0; }
+    100%   { transform: translateX(0px); opacity: 0; }
+  }
+  @keyframes answer {
+    0%,60.00% { opacity: 0; transform: translateX(-10px); }
+    65.71% { opacity: 1; transform: translateX(0px); }
+    96.00% { opacity: 1; transform: translateX(0px); }
+    100%   { opacity: 0; transform: translateX(-10px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chip, .cover, .caret, .scan, .wire, .answer,
+    .win rect.box, .win text.chip-name, .win rect.tag { animation: none; }
+    .cover { display: none; }
+    .answer { opacity: 1; }
+    .chip { opacity: 1; }
+  }
+</style>
+<rect width="900" height="272" rx="16" fill="#0B0D10"/>
+<rect x="0.5" y="0.5" width="899" height="271" rx="16" fill="none" stroke="#1F262F"/>
+<text class="lbl" x="30" y="38">LAPORAN</text>
+<text class="lbl" x="360" y="38">LOG LOKI</text>
+<text class="lbl" x="650" y="38">JAWABAN</text>
+<rect x="30" y="52" width="268" height="112" rx="12" fill="#12161C" stroke="#1F262F"/>
+<text class="body" x="46" y="82">transfer Rp1.250.000</text>
+<text class="body" x="46" y="104">jam 14:00 gagal masuk</text>
+<text class="small" x="46" y="136">Teller cabang &#183; tanpa ID</text>
+<text class="tiny" x="282" y="136" text-anchor="end">14:02</text>
+<g style="transform-origin: 31px 53px" class="cover"><rect x="31" y="53" width="266" height="110" rx="11" fill="#12161C"/></g>
+<g class="caret"><rect x="32" y="68" width="2" height="48" fill="#bdfe0a" opacity="0.8"/></g>
+<g class="chip win">
+<rect class="box" x="360" y="52" width="250" height="38" rx="8" stroke="#1F262F"/>
+<rect class="tag" x="366" y="60" width="3" height="22" rx="1.5" fill="#1F262F"/>
+<text class="chip-name" x="380" y="76">worker-payment</text>
+</g>
+<g class="chip">
+<rect class="box" x="360" y="100" width="250" height="38" rx="8" stroke="#1F262F"/>
+<rect x="366" y="108" width="3" height="22" rx="1.5" fill="#1F262F"/>
+<text class="chip-name" x="380" y="124">worker-core</text>
+</g>
+<g class="chip">
+<rect class="box" x="360" y="148" width="250" height="38" rx="8" stroke="#1F262F"/>
+<rect x="366" y="156" width="3" height="22" rx="1.5" fill="#1F262F"/>
+<text class="chip-name" x="380" y="172">worker-notify</text>
+</g>
+<g class="chip">
+<rect class="box" x="360" y="196" width="250" height="38" rx="8" stroke="#1F262F"/>
+<rect x="366" y="204" width="3" height="22" rx="1.5" fill="#1F262F"/>
+<text class="chip-name" x="380" y="220">worker-settlement</text>
+</g>
+<g style="transform-origin: 352px 71px" class="scan"><circle cx="352" cy="71" r="3" fill="#bdfe0a"/></g>
+<g class="wire"><circle cx="616" cy="71" r="3" fill="#bdfe0a"/></g>
+<g class="answer">
+<rect x="650" y="52" width="222" height="196" rx="12" fill="#0E1216" stroke="#1F262F"/>
+<text class="tiny" x="666" y="76" letter-spacing="1.5">PENYEBAB</text>
+<text x="666" y="100" font-size="15" fill="#bdfe0a">worker-payment</text>
+<text class="small" x="666" y="120">high &#183; Payment Ops</text>
+<rect x="666" y="132" width="128" height="20" rx="5" fill="#161D0C" stroke="#2C3A16"/>
+<text class="badge" x="676" y="146">#payment-war-room</text>
+<text class="tiny" x="666" y="172" letter-spacing="1.5">BUKTI</text>
+<text class="ev" x="666" y="190">14:00:43 upstream timeout</text>
+<text class="ev" x="666" y="204">30000ms &#8594; core-bank</text>
+<text class="ev" x="666" y="218">trx TRX2026102900123</text>
+</g>
+</svg>
