@@ -1,0 +1,19 @@
+{"ts": "2026-10-29T13:58:02+07:00", "job": "worker-notify", "level": "info", "msg": "sms provider session renewed provider=sample-telco"}
+{"ts": "2026-10-29T13:59:10+07:00", "job": "worker-settlement", "level": "info", "msg": "reconcile batch started batch=B-9908"}
+{"ts": "2026-10-29T13:59:44+07:00", "job": "worker-payment", "level": "info", "msg": "transfer request received trx_id=TRX2026102900117 amount=Rp750.000 acct=1234567890123"}
+{"ts": "2026-10-29T13:59:45+07:00", "job": "worker-core", "level": "info", "msg": "core call ok trx_id=TRX2026102900117 latency=182ms"}
+{"ts": "2026-10-29T13:59:46+07:00", "job": "worker-notify", "level": "info", "msg": "sms queued trx_id=TRX2026102900117 msisdn=+628123456789"}
+{"ts": "2026-10-29T14:00:12+07:00", "job": "worker-payment", "level": "info", "msg": "transfer request received trx_id=TRX2026102900123 amount=Rp1.250.000 acct=1234567890123"}
+{"ts": "2026-10-29T14:00:13+07:00", "job": "worker-core", "level": "info", "msg": "core call ok trx_id=TRX2026102900123 latency=210ms"}
+{"ts": "2026-10-29T14:00:43+07:00", "job": "worker-payment", "level": "error", "msg": "upstream timeout after 30000ms calling core-bank trx_id=TRX2026102900123 attempt=1"}
+{"ts": "2026-10-29T14:00:44+07:00", "job": "worker-payment", "level": "error", "msg": "transfer marked failed, reversal queued trx_id=TRX2026102900123 card=4111111111111111"}
+{"ts": "2026-10-29T14:00:45+07:00", "job": "worker-notify", "level": "info", "msg": "sms queued trx_id=TRX2026102900123 msisdn=+628123456789"}
+{"ts": "2026-10-29T14:00:47+07:00", "job": "worker-payment", "level": "warn", "msg": "retry budget exhausted trx_id=TRX2026102900123"}
+{"ts": "2026-10-29T14:01:02+07:00", "job": "worker-settlement", "level": "error", "msg": "batch reconcile mismatch batch=B-9911 expected=812 found=810"}
+{"ts": "2026-10-29T14:01:09+07:00", "job": "worker-notify", "level": "error", "msg": "sms gateway timeout provider=sample-telco attempt=1"}
+{"ts": "2026-10-29T14:01:31+07:00", "job": "worker-payment", "level": "error", "msg": "callback signature mismatch from partner ref=PARTNER-A"}
+{"ts": "2026-10-29T14:02:04+07:00", "job": "worker-core", "level": "info", "msg": "health probe ok core-bank latency=195ms"}
+{"ts": "2026-10-29T14:02:40+07:00", "job": "worker-payment", "level": "info", "msg": "payment gateway heartbeat ok"}
+{"ts": "2026-10-29T14:03:11+07:00", "job": "worker-settlement", "level": "info", "msg": "reconcile batch finished batch=B-9911 mismatches=2"}
+{"ts": "2026-10-29T14:03:55+07:00", "job": "worker-notify", "level": "info", "msg": "sms provider session renewed provider=sample-telco"}
+{"ts": "2026-10-29T14:04:20+07:00", "job": "worker-payment", "level": "info", "msg": "operator ops.desk@example.co.id closed ticket RC-4471"}

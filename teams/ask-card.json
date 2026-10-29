@@ -1,0 +1,31 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.4",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Butuh satu data lagi",
+      "weight": "Bolder",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "ID transaksi membuat jawabannya pasti. Tanpa ID, hasilnya hanya perkiraan berdasarkan volume error.",
+      "wrap": true,
+      "isSubtle": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Isi ID transaksi",
+      "data": { "intent": "ask_trx" }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Lanjut tanpa ID",
+      "data": { "intent": "skip_trx" }
+    }
+  ]
+}

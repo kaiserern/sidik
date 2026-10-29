@@ -1,0 +1,36 @@
+{
+  "type": "AdaptiveCard",
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "version": "1.4",
+  "body": [
+    {
+      "type": "TextBlock",
+      "text": "Nggak perlu ID. Pilih yang paling dekat",
+      "weight": "Bolder",
+      "wrap": true
+    },
+    {
+      "type": "TextBlock",
+      "text": "Tiga pilihan ini sudah cukup menyempitkan worker yang perlu dicek. Kalau ada screenshot struk atau pesan error, lampirkan sekalian: nominal dan jamnya bakal dibaca otomatis.",
+      "wrap": true,
+      "isSubtle": true
+    }
+  ],
+  "actions": [
+    {
+      "type": "Action.Submit",
+      "title": "Dana kepotong, belum masuk",
+      "data": { "intent": "symptom", "symptom": "dana_terpotong" }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Transaksi tertahan",
+      "data": { "intent": "symptom", "symptom": "tertahan" }
+    },
+    {
+      "type": "Action.Submit",
+      "title": "Notifikasi atau OTP nggak sampai",
+      "data": { "intent": "symptom", "symptom": "notifikasi" }
+    }
+  ]
+}

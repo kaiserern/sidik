@@ -1,0 +1,23 @@
+[project]
+name = "sidik"
+version = "0.1.0"
+description = "Dari keluhan transaksi ke worker yang bertanggung jawab."
+requires-python = ">=3.10"
+dependencies = ["httpx>=0.27"]
+
+[project.scripts]
+sidik = "sidik.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["sidik"]
+
+[tool.setuptools.package-data]
+sidik = ["owners.json", "hints.json"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

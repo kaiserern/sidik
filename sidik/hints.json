@@ -1,0 +1,20 @@
+{
+  "symptoms": {
+    "dana_terpotong": {
+      "label": "Dana kepotong, belum masuk ke tujuan",
+      "keyword": ["kepotong", "terpotong", "saldo berkurang", "dana hilang", "belum masuk"],
+      "jobs": ["worker-payment", "worker-core"]
+    },
+    "tertahan": {
+      "label": "Transaksi tertahan atau pending",
+      "keyword": ["tertahan", "pending", "belum selesai", "menggantung", "masih proses"],
+      "jobs": ["worker-payment", "worker-settlement"]
+    },
+    "notifikasi": {
+      "label": "Notifikasi atau OTP tidak sampai",
+      "keyword": ["sms", "otp", "notifikasi", "notif", "email tidak masuk"],
+      "jobs": ["worker-notify"]
+    }
+  },
+  "flow": ["worker-payment", "worker-core", "worker-notify", "worker-settlement"]
+}

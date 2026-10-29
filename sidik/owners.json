@@ -1,0 +1,18 @@
+{
+  "worker-payment": {
+    "owner": "Payment Ops",
+    "channel": "payment-war-room"
+  },
+  "worker-settlement": {
+    "owner": "Settlement",
+    "channel": "settlement-ops"
+  },
+  "worker-notify": {
+    "owner": "Notification",
+    "channel": "notif-ops"
+  },
+  "worker-core": {
+    "owner": "Core Banking Integration",
+    "channel": "core-integration"
+  }
+}
