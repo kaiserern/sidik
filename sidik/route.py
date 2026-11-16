@@ -6,6 +6,7 @@ certain first, and it says which rung answered:
   key      a transaction id was supplied, follow it across every worker
   found    no id typed, but amount/time in the report picked one log line,
            and that line carries the id
+  run      no transaction id exists, but the errors share one run_id
   flow     the id never surfaced, but the payment stages lost transactions
            between one hop and the next
   baseline one worker is erroring far above its own 7-day normal
@@ -42,6 +43,7 @@ class Verdict:
     owner: str | None = None
     channel: str | None = None
     found_trx: str | None = None
+    run_id: str | None = None
     baseline: dict[str, float] = field(default_factory=dict)
     reports: int = 0
     ask: str | None = None
@@ -56,6 +58,7 @@ class Verdict:
             "owner": self.owner,
             "channel": self.channel,
             "found_trx": self.found_trx,
+            "run_id": self.run_id,
             "evidence": self.evidence,
             "counts": self.counts,
             "baseline": self.baseline,
@@ -115,6 +118,8 @@ def route(source, owners: dict, key: str | None = None, minutes: int = 120,
     counts = Counter(e.job for e in events if e.is_error)
     if key:
         verdict = _by_key(key, counts, events, owners, discovered)
+    elif (run := _by_run(errors, owners)) is not None:
+        verdict = run
     elif errors:
         verdict = _by_evidence(source, events, owners, hints, minutes, now,
                                baseline_days, text)
@@ -198,6 +203,23 @@ def ranked_ratio(row: tuple[str, int], base: dict[str, float]) -> float:
     return (row[1] + 1) / (base.get(row[0], 0.0) + 1)
 
 
+def _by_run(errors: list[Event], owners: dict) -> Verdict | None:
+    """A cron run has no trx_id; its run_id already ties the lines together.
+
+    shortcut: one run can fail more than one product, and this still names the
+    job, not the product. Upgrade when a run mixes products.
+    """
+    ids = {e.run_id for e in errors if e.run_id}
+    if len(ids) != 1:
+        return None
+    run_id = ids.pop()
+    jobs = Counter(e.job for e in errors if e.run_id == run_id)
+    job, n = jobs.most_common(1)[0]
+    return _build(job, "high", "run",
+                  f"Run {run_id} error di {job} ({n} baris).",
+                  errors, owners, run_id=run_id)
+
+
 def _build(job: str, confidence: str, basis: str, reason: str, events, owners, **kw) -> Verdict:
     owner_row = owners.get(job, {})
     evidence = [f"{e.ts:%H:%M:%S} {e.job} {redact_event(e.msg)}"
@@ -229,13 +251,15 @@ def render(v: Verdict) -> str:
     ]
     if v.found_trx and v.basis != "key":
         lines.append(f"ID yang dipakai: {v.found_trx}")
+    if v.run_id:
+        lines.append(f"Run: {v.run_id}")
     if v.channel:
         lines.append(f"Eskalasi ke: #{v.channel}")
     if v.counts:
         lines.append("Sebaran: " + ", ".join(f"{j}={n}" for j, n in v.counts.items()))
     if v.reports >= 2:
         lines.append(f"Laporan serupa: {v.reports} dalam 10 menit")
-    if v.funnel:
+    if v.funnel and any(r["ids"] for r in v.funnel):
         lines.append("Alur: " + " -> ".join(f"{r['job'].removeprefix('worker-')}={r['ids']}"
                                             for r in v.funnel))
     if v.evidence:

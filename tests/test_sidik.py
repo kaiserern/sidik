@@ -135,7 +135,7 @@ from datetime import datetime, timedelta  # noqa: E402
 from sidik import cluster, ocr  # noqa: E402
 from sidik.find import amounts, find_trx  # noqa: E402
 from sidik.flow import funnel, worst_hop  # noqa: E402
-from sidik.source import Event, Plan, ReplaySource as Replay  # noqa: E402
+from sidik.source import Event, LokiSource, Plan, ReplaySource as Replay, _parse_line  # noqa: E402
 
 NOW = datetime.fromisoformat("2026-10-29T14:10:00+07:00")
 
@@ -264,3 +264,48 @@ def test_ocr_without_tesseract_says_so(monkeypatch):
 def test_replay_ignores_events_after_now(source):
     early = datetime.fromisoformat("2026-10-29T12:00:00+07:00")
     assert source.fetch(Plan(minutes=120), now=early) == []
+
+
+ECOLL = [
+    ("INFO", "[disbursement-ecollv3] escrow balance check failed: balance inquiry HTTP 404 4041111"),
+    ("INFO", "[disbursement-ecollv3] product ecollv3-aggre-snap failed: check escrow balance"),
+    ("INFO", "[disbursement-ecollv3-daily] run for 2026-11-15 failed 4/4 times, left to the next cycle"),
+    ("ERROR", "ERROR: Job disbursement-ecollv3 failed: product ecollv3-aggre-snap"),
+]
+RUN = "20261116-142700-188165"
+
+
+def test_loki_line_keeps_run_id_and_its_own_job():
+    line = json.dumps({"level": "ERROR", "msg": "ERROR: Job failed",
+                       "job": "disbursement-ecollv3", "run_id": RUN})
+    ev = _parse_line("label-job", line)
+    assert ev.job == "disbursement-ecollv3"
+    assert ev.run_id == RUN
+    assert LokiSource("http://loki")._logql(Plan(minutes=5, contains=RUN)) == \
+        '{job=~"worker-.+"} |= "20261116-142700-188165"'
+
+
+def test_one_run_id_names_the_job(tmp_path, owners):
+    ts = "2026-11-16T14:27:00+07:00"
+    rows = [{"ts": ts, "job": "disbursement-ecollv3", "level": lv, "msg": m, "run_id": RUN}
+            for lv, m in ECOLL]
+    owners = {**owners, "disbursement-ecollv3": {"owner": "Disbursement", "channel": "disbursement-ops"}}
+    v = route(Replay(_write(tmp_path, rows)), owners,
+              now=datetime.fromisoformat("2026-11-16T14:30:00+07:00"), baseline_days=0)
+    assert v.basis == "run"
+    assert v.confidence == "high"
+    assert v.sidik == "disbursement-ecollv3"
+    assert v.run_id == RUN
+    assert v.owner == "Disbursement"
+    assert "Alur" not in render(v)
+
+
+def test_two_run_ids_do_not_pick_one(tmp_path, owners):
+    ts = "2026-11-16T14:27:00+07:00"
+    rows = [{"ts": ts, "job": "disbursement-ecollv3", "level": "ERROR",
+             "msg": "ERROR: Job failed", "run_id": RUN},
+            {"ts": ts, "job": "disbursement-ecollv3", "level": "ERROR",
+             "msg": "ERROR: Job failed", "run_id": "lain"}]
+    v = route(Replay(_write(tmp_path, rows)), owners,
+              now=datetime.fromisoformat("2026-11-16T14:30:00+07:00"), baseline_days=0)
+    assert v.basis != "run"

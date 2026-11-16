@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/tests-21%20lulus-bdfe0a?style=flat-square&labelColor=1f262f" alt="21 test lulus">
+  <img src="https://img.shields.io/badge/tests-24%20lulus-bdfe0a?style=flat-square&labelColor=1f262f" alt="24 test lulus">
   <img src="https://img.shields.io/badge/python-3.10%2B-e8c468?style=flat-square&labelColor=1f262f" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/lisensi-MIT-7c858f?style=flat-square&labelColor=1f262f" alt="Lisensi MIT">
   <img src="https://img.shields.io/badge/butuh%20internet-tidak-7c858f?style=flat-square&labelColor=1f262f" alt="Test jalan tanpa internet">
@@ -62,13 +62,14 @@ Nomor kartu di log asli sudah hilang, berubah jadi `[REDACTED-ID]`. Ini bukan hi
 ## Cara memilih worker: lihat bukti yang ada
 
 <p align="center">
-  <img src="docs/ladder.svg" alt="Enam tingkat bukti, dari ID transaksi dari pelapor sampai bot bertanya balik" width="860">
+  <img src="docs/ladder.svg" alt="Tujuh tingkat bukti, dari ID transaksi dari pelapor sampai bot bertanya balik" width="860">
 </p>
 
 Bot nggak mulai dari "pakai AI atau nggak". Bot mulai dari pertanyaan: **bukti apa yang ada?** Tiap tingkat punya cara jawab sendiri, dan tingkat yang dipakai selalu disebut di baris `Dasar`.
 
 - **ID transaksi ada.** Ikuti ID itu ke semua worker. Kalau error cuma di satu worker, itu jawabannya.
 - **Nggak ada ID, tapi ada nominal, jam, atau struk.** Cari baris log yang cocok, baca ID-nya dari baris itu, lalu lanjut seperti di atas.
+- **Nggak ada ID, tapi semua baris error bawa `run_id` yang sama.** Ikuti run itu. Ini buat job cron dan rekonsiliasi, yang nggak punya ID transaksi sama sekali. Keyakinan `high`, karena ID-nya tertulis di log, bukan hasil tebakan.
 - **Nggak ada ID, tapi arus transaksi kelihatan.** Hitung tiap tahap alur: berapa transaksi sampai payment, core, notify, settlement. Tahap yang paling banyak kehilangan, itu jawabannya.
 - **Cuma gejala.** Tiga tombol di kartu Teams menyempitkan worker yang perlu dicek.
 - **Cuma "ada yang error".** Bandingkan tiap worker dengan kebiasaannya sendiri tujuh hari terakhir di jam yang sama.
@@ -129,7 +130,7 @@ Catatan jujur: angka di atas diukur di build `deepseek-v4.1-flash`. Build `-1017
 
 Cuma satu yang benar-benar menentukan: **worker harus menulis ID transaksi ke log.** Satu field, di setiap baris yang berhubungan dengan transaksi, misalnya `trx_id`.
 
-Tanpa field itu, tiga dari enam tingkat di tangga atas nggak bisa jalan. Jadi kerjaan pertamanya bukan bikin bot, tapi menambahkan field itu di worker.
+Tanpa field itu, tingkat yang mengandalkan ID transaksi nggak bisa jalan. Job yang nggak punya transaksi — cron, rekonsiliasi, batch — nggak perlu dipaksa nulis field itu. Cukup satu `run_id` yang sama di setiap baris satu putaran, dan bot mengikuti run itu.
 
 Cek cepat, field-nya sudah ada atau belum:
 
@@ -149,7 +150,7 @@ python -m sidik ask TRX2026102900123 --replay                      # ada ID
 python -m sidik triage "transfer Rp1.250.000 jam 14:00 gagal" --replay   # tanpa ID
 python -m sidik triage "dana kepotong" --image struk.png --replay        # dari gambar
 python -m sidik funnel --replay                                     # tahap mana yang bocor
-python -m pytest -q                                                 # 21 test
+python -m pytest -q                                                 # 24 test
 ```
 
 Sambung ke Loki asli: isi `LOKI_URL`. Aktifkan AI: isi `LLM_BASE_URL`, `LLM_API_KEY`, `LLM_MODEL`. Semua variabelnya ada di `.env.example`.
@@ -178,7 +179,7 @@ Repo ini juga bukan pengganti tool alerting. Alerting bereaksi ke kondisi yang s
 
 ```
 sidik/source.py        baca log dari Loki atau dari file contoh
-sidik/route.py         tangga enam tingkat, nggak pernah pakai AI buat memilih worker
+sidik/route.py         tangga tujuh tingkat, nggak pernah pakai AI buat memilih worker
 sidik/find.py          cari ID transaksi dari nominal, jam, atau hasil baca gambar
 sidik/flow.py          hitung tahap mana yang kehilangan transaksi
 sidik/cluster.py       hitung laporan serupa dalam 10 menit
@@ -192,6 +193,6 @@ sidik/cli.py           empat perintah: ask, triage, compare, funnel
 tools/cost.py          ukur biaya per laporan pakai usage API yang asli
 data/sample.jsonl      data contoh satu insiden
 teams/                 tiga kartu Teams dan bentuk datanya
-tests/                 21 test, semuanya jalan tanpa internet
+tests/                 24 test, semuanya jalan tanpa internet
 docs/                  dua gambar animasi di atas
 ```

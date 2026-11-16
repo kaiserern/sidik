@@ -20,6 +20,7 @@ class Event:
     job: str
     level: str
     msg: str
+    run_id: str | None = None
 
     @property
     def is_error(self) -> bool:
@@ -56,6 +57,7 @@ class ReplaySource:
                     job=row["job"],
                     level=row.get("level", "info"),
                     msg=row["msg"],
+                    run_id=row.get("run_id") or None,
                 )
                 events.append(ev)
         if plan.contains:
@@ -116,7 +118,8 @@ def _parse_line(job: str, line: str) -> Event:
         return Event(ts=datetime.now(UTC), job=job, level="unknown", msg=line)
     return Event(
         ts=datetime.now(UTC),
-        job=job,
+        job=row.get("job") or job,
         level=str(row.get("level", row.get("severity", "info"))).lower(),
         msg=str(row.get("msg", row.get("message", line))),
+        run_id=row.get("run_id") or None,
     )
