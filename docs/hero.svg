@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="272" viewBox="0 0 900 272" role="img" aria-label="Laporan masuk, log Loki dibaca, jawaban keluar: worker-payment">
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="340" viewBox="0 0 900 340" role="img" aria-label="Laporan masuk, log Loki dibaca, jawaban keluar: worker-payment">
 <style>
   text { font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace; }
   .lbl { font-size: 10px; letter-spacing: 2px; fill: #7C858F; }
@@ -74,19 +74,32 @@
   @keyframes answer {
     0%,60.00% { opacity: 0; transform: translateX(-10px); }
     65.71% { opacity: 1; transform: translateX(0px); }
-    96.00% { opacity: 1; transform: translateX(0px); }
-    100%   { opacity: 0; transform: translateX(-10px); }
+    82.00% { opacity: 1; transform: translateX(0px); }
+    86.00%,100% { opacity: 0; transform: translateX(-10px); }
   }
+  @keyframes runscene {
+    0%,84.00% { opacity: 0; }
+    88.00%,97.00% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  @keyframes runbox {
+    0%,86.00% { stroke: #1F262F; fill: #12161C; }
+    90.00%,97.00% { stroke: #bdfe0a; fill: #161D0C; }
+    100% { stroke: #1F262F; fill: #12161C; }
+  }
+  .run { animation: runscene 14s infinite both; }
+  .runbox { animation: runbox 14s infinite both; }
   @media (prefers-reduced-motion: reduce) {
     .chip, .cover, .caret, .scan, .wire, .answer,
-    .win rect.box, .win text.chip-name, .win rect.tag { animation: none; }
+    .win rect.box, .win text.chip-name, .win rect.tag, .run { animation: none; }
     .cover { display: none; }
     .answer { opacity: 1; }
     .chip { opacity: 1; }
+    .run { display: none; }
   }
 </style>
-<rect width="900" height="272" rx="16" fill="#0B0D10"/>
-<rect x="0.5" y="0.5" width="899" height="271" rx="16" fill="none" stroke="#1F262F"/>
+<rect width="900" height="340" rx="16" fill="#0B0D10"/>
+<rect x="0.5" y="0.5" width="899" height="339" rx="16" fill="none" stroke="#1F262F"/>
 <text class="lbl" x="30" y="38">LAPORAN</text>
 <text class="lbl" x="360" y="38">LOG LOKI</text>
 <text class="lbl" x="650" y="38">JAWABAN</text>
@@ -130,5 +143,16 @@
 <text class="ev" x="666" y="190">14:00:43 upstream timeout</text>
 <text class="ev" x="666" y="204">30000ms &#8594; core-bank</text>
 <text class="ev" x="666" y="218">trx TRX2026102900123</text>
+</g>
+<g class="run">
+<rect x="30" y="264" width="268" height="52" rx="12" fill="#12161C" stroke="#1F262F"/>
+<text class="body" x="46" y="286">rekon harian gagal</text>
+<text class="small" x="46" y="304">cron, tanpa trx_id</text>
+<rect class="runbox" x="360" y="264" width="250" height="52" rx="8"/>
+<text x="380" y="294" font-size="12" fill="#bdfe0a">run 20261116-142700</text>
+<g>
+<rect x="650" y="264" width="222" height="52" rx="12" fill="#0E1216" stroke="#1F262F"/>
+<text x="666" y="294" font-size="13" fill="#bdfe0a">disbursement-ecollv3</text>
+</g>
 </g>
 </svg>
